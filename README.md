@@ -122,15 +122,13 @@ riscv64-unknown-elf-ld --version
 riscv64-elf-gdb --version
 ```
 
-## Running the programs
-TODO: @beau -- clean this up
+## Smol tips For using qemu and gdb
+When your assembly program starts running in qemu, the program takes over stdin and stdout. Here are a few keyboard shortcuts that cna help you out
+- `ctrl-a x` -- exit qemu and stop running this program
+- `ctrl-a c` -- to change stdin/stdout to show the qemu monitor 
+- `ctrl-a c` -- to swtich back to qemu's default stdin/stdout from the qemu monitor
 
-Running the program
-- `make run`
-
-Running the program with a debugger
-- `make run-debug` then in a seperate window run `riscv64-elf-gdb` and you can step through the program
-
-Qemu controls
-- ctrl-a x -- exit qemu
-- ctrl-a c -- start console
+There are many resources out there for using gdb, but here are some of the commmands
+I often times struggle to remember. Leaving them here for my future self
+- `tui enable` -- this enables a much richer terminal ui for gdb
+- `layout next` -- switch to the next layout in the tui (some show c code, others show assembly, etc)
