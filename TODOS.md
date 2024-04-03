@@ -8,6 +8,8 @@ These notes are really just for me, I make no promises that any of this will be 
 
 ## chapter 00 todos
 - write the readme
+- add something that detects your platform and echos the correct instruction to open gdb in another window
+- update it to just spin in circles
 - make it a multi-file program just to highlight the linker
 - maybe make it so that we don't have to specify all the source files explicitly
 - cleanup the makefile output consistent objec names
@@ -37,6 +39,6 @@ These notes are really just for me, I make no promises that any of this will be 
 
 ## 0????
 - way down the line, I would love to add support for a disc device, possibly a network device?
-- add additional chapters that explain supervisor mode, software interrupts etc
+- add additional chapters that explain supervisor mode, software interrupts etC
 
 
