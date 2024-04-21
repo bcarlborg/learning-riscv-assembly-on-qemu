@@ -2,7 +2,7 @@
 I like to keep a very simple todo list for little (and big) things that I am planning to do in the near future.
 These notes are really just for me, I make no promises that any of this will be done, or that these todos are even coherent.
 
-## immediate todos
+## Immediate Todos (02-expanding-framework-structure)
 I want the project (loosely) to follow this structure
 steps to get there
 - break out uart from start.s
@@ -11,7 +11,7 @@ steps to get there
 - create a file main.s that calls the program behavior
 - move all the framework code into its own directory
 
-### Desired directory structure
+### Desired Directory Structure
 framework/
   entry.s
   framework.s
@@ -19,7 +19,7 @@ framework/
   uart.s
   memlayout.s
 
-### Desired exectuable memory layout
+### Desired Exectuable Memory Layout
 section: text.entry (only has _entry)
 section: text       (has all other program content)
 section: data       (has all static data)
