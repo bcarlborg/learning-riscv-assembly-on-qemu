@@ -3,7 +3,7 @@
 # symbols that will be defined in a different part of the project
 #############################################################################
 
-.extern start
+.extern _start
 .extern STACK_BASE
 
 #############################################################################
@@ -23,4 +23,4 @@ _entry:
     #
     ld sp, STACK_BASE
 
-    j start
+    j _start

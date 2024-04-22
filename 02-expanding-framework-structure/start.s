@@ -5,8 +5,8 @@
 
     .section .text
 
-    .global start
-start:
+    .global _start
+_start:
     #
     # First we need to initialize our uart device to prepare to transmit things
     #
