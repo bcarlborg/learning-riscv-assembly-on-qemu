@@ -27,7 +27,9 @@
 # List of assembly source files that will be assembled
 # any source file in this list will be assembled and linked
 # into the executable
-SOURCES = entry.s start.s uart.s memlayout.s
+
+SOURCES := $(wildcard ./framework/*.s)
+SOURCES += $(wildcard ./*.s)
 
 # List of object files based on source file inputs
 # these will all be linked into the final output executable
