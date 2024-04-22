@@ -3,12 +3,10 @@ I like to keep a very simple todo list for little (and big) things that I am pla
 These notes are really just for me, I make no promises that any of this will be done, or that these todos are even coherent.
 
 ## Immediate Todos (03-timer-interrupts)
-  - create new directory and copy over everything from 02
-  - create the enable interrupt and disable interrupt functions, also create the interrupt_vec label
-  - create branching structure in interrupt_vec for the different values of mcause
-  - create the timer file with initialize timer and handle interrupt
-  - debug and test
-  - get the characters to print on some interval
+  - store an updated time variable in some const in timer.s
+  - [misc] remove duplicated uart code
+  - [misc] remove the external thing?
+
 
 ### new files
 - timer.s
