@@ -27,7 +27,7 @@
 # List of assembly source files that will be assembled
 # any source file in this list will be assembled and linked
 # into the executable
-SOURCES = entry.s start.s
+SOURCES = entry.s start.s uart.s
 
 # List of object files based on source file inputs
 # these will all be linked into the final output executable
