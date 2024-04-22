@@ -5,7 +5,7 @@
 # Static Data
 #############################################################################
 
-    .section .data
+.section .data
 
 
 # these offsets only act as these registers when the divisor latch access bit

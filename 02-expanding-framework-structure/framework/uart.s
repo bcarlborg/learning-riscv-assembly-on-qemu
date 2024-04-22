@@ -4,7 +4,7 @@
 # Static Data
 #############################################################################
 
-    .section .data
+.section .data
 
 # these offsets only act as these registers when the divisor latch access bit
 # is set in the LCR
@@ -33,7 +33,7 @@ STACK_BASE:
 # Our our program text
 #############################################################################
 
-    .section .text
+.section .text
 
 #
 # Function to intialize the UART

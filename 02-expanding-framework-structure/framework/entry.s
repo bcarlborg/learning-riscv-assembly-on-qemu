@@ -11,11 +11,11 @@
 # The program
 #############################################################################
 
-    # .section .text.entry tells the assembler that everything following this directive
-    # belongs in the .text.entry section of the object file
-    .section .text.entry
+# .section .text.entry tells the assembler that everything following this directive
+# belongs in the .text.entry section of the object file
+.section .text.entry
 
-    .global _entry
+.global _entry
 _entry:
     #
     # initialize our stack

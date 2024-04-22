@@ -5,9 +5,7 @@ These notes are really just for me, I make no promises that any of this will be 
 ## Immediate Todos (02-expanding-framework-structure)
 I want the project (loosely) to follow this structure
 steps to get there
-- rename labels in framework to use _
-- create a file main.s that calls the program behavior
-- move all the framework code into its own directory
+- compile all output into a dist directory
 
 ### Desired Directory Structure
 framework/
