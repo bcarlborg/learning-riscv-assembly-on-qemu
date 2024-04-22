@@ -27,7 +27,7 @@
 # List of assembly source files that will be assembled
 # any source file in this list will be assembled and linked
 # into the executable
-SOURCES = entry.s start.s uart.s
+SOURCES = entry.s start.s uart.s memlayout.s
 
 # List of object files based on source file inputs
 # these will all be linked into the final output executable
@@ -154,9 +154,9 @@ $(EXECUTABLE): $(OBJECTS) $(LINKER_SCRIPT)
 ###########################################################################
 
 # Rule to run the executable with QEMU
+# The -kernel option will load our elf file executable directly 
+# into DRAM on the virtual riscv board and start execution there
 run: $(EXECUTABLE)
-	# The -kernel option will load our elf file executable directly 
-	# into DRAM on the virtual riscv board and start execution there
 	$(QEMU) $(QEMU_FLAGS) -kernel $(EXECUTABLE)
 
 # Rule for running the executable with QEMU in a mode that is compatible

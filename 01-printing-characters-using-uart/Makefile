@@ -154,9 +154,9 @@ $(EXECUTABLE): $(OBJECTS) $(LINKER_SCRIPT)
 ###########################################################################
 
 # Rule to run the executable with QEMU
+# The -kernel option will load our elf file executable directly 
+# into DRAM on the virtual riscv board and start execution there
 run: $(EXECUTABLE)
-	# The -kernel option will load our elf file executable directly 
-	# into DRAM on the virtual riscv board and start execution there
 	$(QEMU) $(QEMU_FLAGS) -kernel $(EXECUTABLE)
 
 # Rule for running the executable with QEMU in a mode that is compatible

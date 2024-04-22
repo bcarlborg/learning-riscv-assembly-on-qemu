@@ -21,7 +21,7 @@
 .equ UART_LSR_OFFSET, 5 # line status register
 
 
-VIRT_UART_BASE:
+UART_BASE:
     .dword 0x10000000
 
 STACK_BASE:
@@ -50,7 +50,7 @@ uart_initialize:
     #
 
     li t1, 0
-    ld t0, VIRT_UART_BASE
+    ld t0, UART_BASE
     sb t1, UART_IER_OFFSET(t0)
 
 
@@ -67,7 +67,7 @@ uart_initialize:
     slli t1, t1, 7
 
     # now that we have 1<<7 in x1, lets write that to the LCR
-    ld t0, VIRT_UART_BASE
+    ld t0, UART_BASE
     sb t1, UART_LCR_OFFSET(t0)
 
     #
@@ -76,11 +76,11 @@ uart_initialize:
     #
 
     li t1, 0x03
-    ld t0, VIRT_UART_BASE
+    ld t0, UART_BASE
     sb t1, UART_DLL_OFFSET(t0)
 
     li t1, 0x00
-    ld t0, VIRT_UART_BASE
+    ld t0, UART_BASE
     sb t1, UART_DLM_OFFSET(t0)
 
     #
@@ -88,7 +88,7 @@ uart_initialize:
     # by writing all zeros to the LCR
     #
 
-    ld t0, VIRT_UART_BASE
+    ld t0, UART_BASE
     sb x0, UART_LCR_OFFSET(t0)
 
     #
@@ -99,7 +99,7 @@ uart_initialize:
     #
 
     li t1, 0x03
-    ld t0, VIRT_UART_BASE
+    ld t0, UART_BASE
     sb t1, UART_LCR_OFFSET(t0)
 
 
@@ -112,7 +112,7 @@ uart_initialize:
     #
 
     li t1, 0x07
-    ld t0, VIRT_UART_BASE
+    ld t0, UART_BASE
     sb t1, UART_LCR_OFFSET(t0)
 
     # Function epilogue
@@ -140,7 +140,7 @@ uart_put_character:
     #
 
 uart_put_character__test_ready:    
-    ld t0, VIRT_UART_BASE
+    ld t0, UART_BASE
     lb t1, UART_LSR_OFFSET(t0)
 
     # Shift right by 5 bits to isolate the 6th bit
@@ -155,7 +155,7 @@ uart_put_character__test_ready:
     # Transmit our character! (first argument that we stored in t3)
     #
 
-    ld t0, VIRT_UART_BASE
+    ld t0, UART_BASE
     sb t3, UART_THR_OFFSET(t0)
 
     # Function epilogue
