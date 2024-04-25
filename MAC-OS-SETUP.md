@@ -4,7 +4,7 @@ To build and run the programs in this project, we will need to install the follo
 - `homebrew`: a package manager for macOS that will make it easier to install the following deps
 - `riscv64-unknown-elf-as`: a riscv64 version of the gnu assembler
 - `riscv64-unknown-elf-ld`: a riscv64 version of the gnu linker
-- `qemu-system-riscv64`: the executable to run qemu and simulate our riscv 64 board
+- `qemu-system-riscv64`: the executable to run qemu and simulate our RISC-V 64 board
 - `riscv64-elf-gdb`: a build of gdb that can attach to qemu simulating riscv64
 - `socat`: a command line tool that makes it easy to forward data from files to pipes and sockets
 
@@ -16,14 +16,14 @@ xcode-select --install
 # install homebrew (skip this if brew is already installed on your system)
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# installing the riscv compiler toolchain gives us the cross platform builds of the gnu tools
+# installing the RISC-V compiler toolchain gives us the cross platform builds of the gnu tools
 # we need in order to build code for a riscv64 system. Specifically the executables
 # riscv64-unknown-elf-as and riscv64-unknown-elf-ld
 brew tap riscv/riscv
 $ brew install riscv-tools
 
 # you may also need to add the following line to your `~/bashrc` or `~/.zshrc` file depending on how the
-# riscv compiler toolchain installs to make sure your shell can find those executables
+# RISC-V compiler toolchain installs to make sure your shell can find those executables
 PATH=$PATH:/usr/local/opt/riscv-gnu-toolchain/bin
 
 # install qemu, this will give us the qemu executables we need to run our riscv64 code

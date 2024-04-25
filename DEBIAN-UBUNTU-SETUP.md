@@ -3,7 +3,7 @@ To build and run the programs in this project, we will need to install the follo
 - the generic build essential tools
 - `riscv64-linux-gnu-as`: a riscv64 version of the gnu assembler
 - `riscv64-linux-gnu-ld`: a riscv64 version of the gnu linker
-- `qemu-system-riscv64`: the executable to run qemu and simulate our riscv 64 board
+- `qemu-system-riscv64`: the executable to run qemu and simulate our RISC-V 64 board
 - `gdb-multiarch`: a build of gdb that can attach to qemu simulating riscv64
 - `socat`: a command line tool that makes it easy to forward data from files to pipes and sockets
 
@@ -35,7 +35,7 @@ Verify your installation by running the following commands
 # ensure that we have a version of qemu that will run riscv64 code
 qemu-system-riscv64 --version
 
-# ensure that we have the gnu tools necessary to build our riscv code
+# ensure that we have the gnu tools necessary to build our RISC-V code
 riscv64-linux-gnu-as --version
 riscv64-linux-gnu-ld --version
 

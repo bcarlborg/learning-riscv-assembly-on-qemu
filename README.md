@@ -6,12 +6,12 @@ This project is organized into sub-directories, each representing a different st
 Feel free to explore and get inspired as you see assembly programming in action!
 See the README.md in each of the sub-directories for information about what the software in that directory does.
 
-## What is a qemu virtual riscv board? 
-**To start: what is RISC-V assembly?**
+## What is a virtual RISC-V Qemu board? 
+**To start: what is RISC-V?**
 
 RISC-V (commonly pronounced as "risc five") is a type of assembly language for processors that follow the open RISC-V instruction set architecture. It's designed to be simple and modular, perfect for learning how CPUs interpret commands.
 
-**Ok... but what is a virtualized QEMU board?**
+**Ok... and what is a virtual Qemu board?**
 
 QEMU (possibly pronounce "queue emu" or "keh-moo") is a tool that lets us emulate a complete computer system, like a RISC-V board, right on your desktop! This means you can write and test assembly programs in a simulated environment without needing real hardware. It's ideal for exploring and debugging.
 
@@ -49,9 +49,9 @@ make monitor              # and run this in yet another terminal
 
 ## Dependencies
 This project depends on a few executables
-- **A riscv64 qemu build**: A build of the qemu programthat simulates riscv boards.
-- **the riscv64 gnu tools**: We rely on a handful of gnu tools (`as` & `ld`) to build our riscv programs, we need an install of that software that understands the riscv architecture.
-- **A riscv64 compatible gdb**: We will use gdb to debug our programs, and so we will need a build of gdb that can process riscv code running in qemu.
+- **A riscv64 qemu build**: A build of the qemu programthat simulates RISC-V boards.
+- **the riscv64 gnu tools**: We rely on a handful of gnu tools (`as` & `ld`) to build our RISC-V programs, we need an install of that software that understands the RISC-V architecture.
+- **A riscv64 compatible gdb**: We will use gdb to debug our programs, and so we will need a build of gdb that can process RISC-V code running in qemu.
 - **socat**: A tool for easily connecting data sources like sockets, files, and pipes. We use it as a way to connect to the qemu monitor.
 
 For instructions on installing the dependencies see the [macOS setup instructions](MAC-OS-SETUP.md) or the [debian/ubuntu setup instructions](DEBIAN-UBUNTU-SETUP.md). 
