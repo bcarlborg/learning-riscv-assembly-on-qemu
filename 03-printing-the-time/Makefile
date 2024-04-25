@@ -80,8 +80,6 @@ RISC64_GNU_TOOL_PREFIX := $(or \
 	$(error *** ERROR: Couldn't find a riscv64 version of the GCC/binutils.) \
 )
 
-$(echo "bcarlborg testy testy")
-
 # Assembler that will generate valid riscv64 bytecode
 AS = $(RISC64_GNU_TOOL_PREFIX)as
 
@@ -114,7 +112,6 @@ QEMU_FLAGS += -bios none
 # where the stdin comes from and where the qemy monitor goes to
 QEMU_FLAGS += -nographic
 
-
 # Initialize a QEMU_DEBUG_FLAGS variable. These flags are an extension
 # of what we already have in QEMU_FLAGS.
 QEMU_DEBUG_FLAGS = $(QEMU_FLAGS)
@@ -126,6 +123,18 @@ QEMU_DEBUG_FLAGS  += -s
 # -S starts qemu in a debugging mode. So qemu will be paused until it is started
 # by the debugger
 QEMU_DEBUG_FLAGS  += -S
+
+# -monitor with these options tells qemu to forward the qemu monitor
+# to a unix socket. This allows us to start a monitor for this running
+# qemu instance in another tab.
+# here qemu-monitor-socket is a pathname of the socket to create
+# https://unix.stackexchange.com/questions/426652/connect-to-running-qemu-instance-with-qemu-monitor
+# run socat -,echo=0,icanon=0 unix-connect:qemu-monitor-socket in another terminal window
+QEMU_MONITOR_FLAGS += -monitor unix:qemu-monitor-socket,server
+
+# This project uses a version of GDB that is compiled to debug riscv64 programs.
+# It is installed with different names on different systems
+DEBUGGER := $(shell which gdb-multiarch || which riscv64-elf-gdb)
 
 ###########################################################################
 # BUILD RULES
@@ -159,17 +168,66 @@ $(EXECUTABLE): $(OBJECTS) $(LINKER_SCRIPT)
 # The -kernel option will load our elf file executable directly 
 # into DRAM on the virtual riscv board and start execution there
 run: $(EXECUTABLE)
-	$(QEMU) $(QEMU_FLAGS) -kernel $(EXECUTABLE)
+	@echo '>>> STARTING QEMU'
+	@echo '  > When you wish to end the qemu process, type ctrl-a x'
+	@$(QEMU) $(QEMU_FLAGS) -kernel $(EXECUTABLE)
 
 # Rule for running the executable with QEMU in a mode that is compatible
 # with attaching a debugger to inspect our program
 run-debug: $(EXECUTABLE)
-	$(QEMU) $(QEMU_FLAGS) $(QEMU_DEBUG_FLAGS) -kernel $(EXECUTABLE)
+	@echo '>>> STARTING QEMU IN MONITOR MODE'
+	@echo '  > Qemu will not start until another terminal runs the'
+	@echo '    debugger. In a seperate terminal, navigate to this'
+	@echo '    same directory and execute `make debugger`'
+	@echo '  > When you wish to end the qemu process, type ctrl-a x'
+	@$(QEMU) $(QEMU_FLAGS) $(QEMU_DEBUG_FLAGS) -kernel $(EXECUTABLE)
+
+# Rule for running the executable with QEMU in a mode that is compatible
+# with running the qemu monitor in a sperate terminal 
+run-monitor: $(EXECUTABLE)
+	@echo '>>> STARTING QEMU IN MONITOR MODE'
+	@echo '  > Qemu will not start until another terminal is attached'
+	@echo '    to the monitor. In a seperate terminal, navigate to this'
+	@echo '    same directory and execute `make monitor`'
+	@echo '  > When you wish to end this qemu process, type ctrl-c or run'
+	@echo '    quit in the qemu console in the other terminal'
+	@$(QEMU) $(QEMU_FLAGS) $(QEMU_MONITOR_FLAGS) -kernel $(EXECUTABLE)
+
+# Rule for running the executable with QEMU in a mode that is compatible
+# with attaching a debugger to inspect our program AND running the monitor
+# in another window
+run-monitor-debug run-debug-monitor: $(EXECUTABLE)
+	@echo '>>> STARTING QEMU IN DEBUG & MONITOR MODE'
+	@echo '  > In a seperate terminal navigate to this same directory and'
+	@echo '    execute `make debugger`'
+	@echo '  > In another terminal, navigate to this same directory and'
+	@echo '    execute `make monitor`'
+	@echo '  > note: Qemu will not start until BOTH the debugger runs AND'
+	@echo '    the monitor are attached in other terminal windows.'
+	@echo '  > When you wish to end this qemu process, type ctrl-c or run'
+	@echo '    quit in the qemu console in the other terminal'
+	@$(QEMU) $(QEMU_FLAGS) $(QEMU_DEBUG_FLAGS) $(QEMU_MONITOR_FLAGS) -kernel $(EXECUTABLE)
+
+# This rule will start the debugger in the terminal that it is run in.
+# You must run make run-debug or make run-debug-monitor before running
+# make with this target
+debugger:
+	@echo '>>> ATTATCHING A DEBUGGER TO QEMU'
+	@$(DEBUGGER)
+
+# This rule will attatch the terminal it is run in to the runnign instance
+# of qemu's monitor. You must run make run-monitor or make run-debug-monitor
+# before running make with this target
+monitor:
+	@echo '>>> ATTATCHING THIS TERMINAL TO QEMU MONITOR'
+	@socat -,echo=0,icanon=0 unix-connect:qemu-monitor-socket
+
 
 # Rule to clean up generated files
 clean:
+	@echo '>>> REMOVING ALL BUILD FILES IN THIS DIRECTORY'
 	rm -f $(OBJECTS) $(EXECUTABLE)
 
 # Mark our run targets as phony. Phony targets are targets that are run 
 # for the side effects of their recipe rather than to build something
-.PHONY: all clean run run-debug
+.PHONY: all clean debugger monitor
