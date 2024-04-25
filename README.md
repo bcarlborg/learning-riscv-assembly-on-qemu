@@ -6,13 +6,14 @@ This project is organized into sub-directories, each representing a different st
 Feel free to explore and get inspired as you see assembly programming in action!
 See the README.md in each of the sub-directories for information about what the software in that directory does.
 
-## What is a qemu virtual riscv board?
-*What is RISC-V Assembly?*
+## What is a qemu virtual riscv board? 
+*To start: what is RISC-V assembly?*
 
-RISC-V is a type of assembly language for processors that follow the open RISC-V instruction set architecture. It's designed to be simple and modular, perfect for learning how CPUs interpret commands. Learn more about RISC-V.
+RISC-V is a type of assembly language for processors that follow the open RISC-V instruction set architecture. It's designed to be simple and modular, perfect for learning how CPUs interpret commands.
 
-*What is a Virtualized QEMU Board?*
-QEMU is a tool that lets us emulate a complete computer system, like a RISC-V board, right on your desktop! This means you can write and test assembly programs in a simulated environment without needing real hardware. It's ideal for exploring and debugging. Explore QEMU.
+*Ok... but what is a virtualized QEMU board?*
+
+QEMU is a tool that lets us emulate a complete computer system, like a RISC-V board, right on your desktop! This means you can write and test assembly programs in a simulated environment without needing real hardware. It's ideal for exploring and debugging.
 
 ## Running the programs
 Once you have the dependencies below installed you can `cd` into any of the numbered sub directories in this project and use the makefile to build and run the project. The following make commands will work in each sub directory
