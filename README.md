@@ -1,7 +1,18 @@
 # Learning RISC-V Assembly on Qemu
-This repository tracks my work learning how to riscv systems work and learning how to write assembly for them! Each sub directory is a fully contained project that represents some step in the learning process. Each sub-directory builds on the last in some meaningful way. Some extend the functionality of the assembly code and program while other sub-directories refactor and improve the project structure without changing much functionality.
+Welcome to my repository of assembly programs designed for an emulated RISC-V computer!
 
+This project is organized into sub-directories, each representing a different stage of my journey learning assembly programming for a virtual RISC-V system. Every folder is a complete project in itself, building upon the last by introducing new features or enhancing the structure and efficiency of the code. Dive into each one to see the progression of functionality and improvements!
+
+Feel free to explore and get inspired as you see assembly programming in action!
 See the README.md in each of the sub-directories for information about what the software in that directory does.
+
+## What is a qemu virtual riscv board?
+*What is RISC-V Assembly?*
+
+RISC-V is a type of assembly language for processors that follow the open RISC-V instruction set architecture. It's designed to be simple and modular, perfect for learning how CPUs interpret commands. Learn more about RISC-V.
+
+*What is a Virtualized QEMU Board?*
+QEMU is a tool that lets us emulate a complete computer system, like a RISC-V board, right on your desktop! This means you can write and test assembly programs in a simulated environment without needing real hardware. It's ideal for exploring and debugging. Explore QEMU.
 
 ## Running the programs
 Once you have the dependencies below installed you can `cd` into any of the numbered sub directories in this project and use the makefile to build and run the project. The following make commands will work in each sub directory
