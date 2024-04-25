@@ -1,11 +1,8 @@
-# Setting up a build and run environment
-TODO BEAU -- Write a blurb here about what we are doing in this directory
+# 00: Setting up a build and run environment
+The purpose of the software in this directory is to simply get qemu up and running code that we've written.
 
-Also want to emphasize that you can ignore a lot of this. You don't need to get super in depth with this stuff to learn riscv
+When you run the program contained in this directory with `make run`, you won't see anything happen in the terminal. That's expected! The program that I've written here simply spins in a loop of no-ops. If you want to see that for yourself, you can run `make run-debug` and `make debugger` to step through the execution and see that.
 
-It is going to be hard to find the right level of depth for this chapter, because these build tools aren't really the focus of this work. Somethings I want to cover
-- explain (roughly) what make is and what it is doing. Why are we using it
-  - mainly to make our lives easier! There is nothing that make is doing that we couldn't
-    do by just running commands in the terminal
-  - explain the rough flow of our program from source, to objects, to executable, to being loaded in qemu
-  - provide a rough overview of the qemu virt board
+The "interesting" files to look at here are the makefile and the linker script. But ultimately, this project is more about learning assembly than it is about learning build systems... and this makefile might throw you too far into the deep-end.
+
+To get to more interesting programs, continue on to `01`.
