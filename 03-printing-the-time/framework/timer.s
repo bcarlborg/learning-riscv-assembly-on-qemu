@@ -36,7 +36,7 @@ initialize_timer:
 
 reset_mtimecmp:
     # load the current time (THIS HAS THE ADDRESS NOT THE VALUE)
-    ld t0, CLINT_MTIME
+    ld t0, CLINT_MTIME_REG
     ld t1, 0(t0)
 
     # get the interval we want between interrupts
@@ -47,7 +47,7 @@ reset_mtimecmp:
 
     # store that updated time in MTIMECMP so that we will
     # generate an interrupt once we get to that time
-    la t1, CLINT_MTIMECMP
+    la t1, CLINT_MTIMECMP_REG
     ld t0, 0(t1)
     sd t2, 0(t0)
 
@@ -62,7 +62,7 @@ handle_timer_interrupt:
     addi fp, sp, 16     # set a new fram pointer
 
     # get the current ticks from clint
-    la t1, CLINT_MTIME
+    la t1, CLINT_MTIME_REG
 
     # store that in ticks time
     la t0, ticks_time

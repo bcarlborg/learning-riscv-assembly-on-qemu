@@ -6,27 +6,6 @@
 
 .section .data
 
-# these offsets only act as these registers when the divisor latch access bit
-# is set in the LCR
-.equ UART_DLL_OFFSET, 0 # divisor latch least significant byte register
-.equ UART_DLM_OFFSET, 1 # divisor latch most significant byte register
-
-
-.equ UART_RBR_OFFSET, 0 # receive buffer register (read only)
-.equ UART_THR_OFFSET, 0 # transmitter holding register (write only)
-.equ UART_IER_OFFSET, 1 # interrupt enable register
-.equ UART_IIR_OFFSET, 2 # interrupt identify register (only is IIR when writing)
-.equ UART_FCR_OFFSET, 2 # fifo control register (only is FCR when writing)
-.equ UART_LCR_OFFSET, 3 # line control register
-.equ UART_LSR_OFFSET, 5 # line status register
-
-
-UART_BASE:
-    .dword 0x10000000
-
-STACK_BASE:
-    .dword 0x80008000
-
 
 #############################################################################
 # SECTION: TEXT
@@ -50,8 +29,8 @@ uart_initialize:
     #
 
     li t1, 0
-    ld t0, UART_BASE
-    sb t1, UART_IER_OFFSET(t0)
+    ld t0, UART_IER_REG
+    sb t1, 0(t0)
 
 
     #
@@ -67,8 +46,8 @@ uart_initialize:
     slli t1, t1, 7
 
     # now that we have 1<<7 in x1, lets write that to the LCR
-    ld t0, UART_BASE
-    sb t1, UART_LCR_OFFSET(t0)
+    ld t0, UART_LCR_REG
+    sb t1, 0(t0)
 
     #
     # now that the divisor latch access bit is set in the LCR, we can set our
@@ -76,20 +55,20 @@ uart_initialize:
     #
 
     li t1, 0x03
-    ld t0, UART_BASE
-    sb t1, UART_DLL_OFFSET(t0)
+    ld t0, UART_DLL_REG
+    sb t1, 0(t0)
 
     li t1, 0x00
-    ld t0, UART_BASE
-    sb t1, UART_DLM_OFFSET(t0)
+    ld t0, UART_DLM_REG
+    sb t1, 0(t0)
 
     #
     # Now that our baud rate is set, we can disable the divsor latch access mode
     # by writing all zeros to the LCR
     #
 
-    ld t0, UART_BASE
-    sb x0, UART_LCR_OFFSET(t0)
+    ld t0, UART_LCR_REG
+    sb x0, 0(t0)
 
     #
     # Now we want to configure the word size that our uart will use for data transmission
@@ -99,8 +78,8 @@ uart_initialize:
     #
 
     li t1, 0x03
-    ld t0, UART_BASE
-    sb t1, UART_LCR_OFFSET(t0)
+    ld t0, UART_LCR_REG
+    sb t1, 0(t0)
 
 
     #
@@ -112,8 +91,8 @@ uart_initialize:
     #
 
     li t1, 0x07
-    ld t0, UART_BASE
-    sb t1, UART_LCR_OFFSET(t0)
+    ld t0, UART_LCR_REG
+    sb t1, 0(t0)
 
     # Function epilogue
     ld ra, 0(sp)          # Restore return address
@@ -140,8 +119,8 @@ uart_put_character:
     #
 
 uart_put_character__test_ready:    
-    ld t0, UART_BASE
-    lb t1, UART_LSR_OFFSET(t0)
+    ld t0, UART_LSR_REG
+    lb t1, 0(t0)
 
     # Shift right by 5 bits to isolate the 6th bit
     srli t1, t1, 5
@@ -155,8 +134,8 @@ uart_put_character__test_ready:
     # Transmit our character! (first argument that we stored in t3)
     #
 
-    ld t0, UART_BASE
-    sb t3, UART_THR_OFFSET(t0)
+    ld t0, UART_THR_REG
+    sb t3, 0(t0)
 
     # Function epilogue
     ld ra, 0(sp)          # Restore return address
