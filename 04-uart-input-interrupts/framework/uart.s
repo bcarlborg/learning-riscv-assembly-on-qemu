@@ -176,3 +176,72 @@ uart_put_character__test_ready:
     addi sp, sp, 8        # Deallocate space on the stack
     jr ra                 # Return to the caller
 
+#
+# Interrupt handler for external interrupts from the PLIC
+#
+.globl handle_uart_interrupt
+handle_uart_interrupt:
+    # function prologue
+    addi sp, sp, -24 # allocate space on the stack for the return address and frame pointer
+    sd ra, 16(sp)        # save the return address
+    sd s0, 8(sp)
+    sd fp, 0(sp)        # save the frame pointer
+    addi fp, sp, 16     # set a new fram pointer
+
+    call read_uart_chars_until_buffer_empty
+
+    # Epilogue
+    ld ra, 16(sp)     # Restore return address
+    ld s0, 8(sp)     # Restore return address
+    ld fp, 0(sp)     # Restore frame pointer
+    addi sp, sp, 24  # Deallocate stack space
+    ret              # Return to caller
+
+
+#
+# Read Uart chars until buffer is empty
+#
+read_uart_chars_until_buffer_empty:
+    # function prologue
+    addi sp, sp, -24 # allocate space on the stack for the return address and frame pointer
+    sd ra, 16(sp)        # save the return address
+    sd s0, 8(sp)
+    sd fp, 0(sp)        # save the frame pointer
+    addi fp, sp, 16     # set a new fram pointer
+
+
+read_uart_chars_until_buffer_empty__start:
+
+    #
+    # Read the line status register to figure out what we can do.
+    # Are we ready to transmit a character? or to read one? both?
+    #
+
+    ld t0, UART_LSR_REG
+    lb t1, 0(t0)
+
+    li t0, 1
+    and t0, t1, t0       # t0 has the first bit in the lsr register
+                         # which is the data ready bit, tell us if
+                         # a byte is received
+
+    # t0 == 0, then exit... there are no chars to read
+    beq t0, x0, read_uart_chars_until_buffer_empty__end 
+
+    ld t0, UART_RBR_REG
+    lb a0, 0(t0)          # a0 holds the byte we read from the receive buffer
+
+    jal uart_put_character
+
+    j read_uart_chars_until_buffer_empty__start 
+
+read_uart_chars_until_buffer_empty__end:
+
+
+    # Epilogue
+    ld ra, 16(sp)     # Restore return address
+    ld s0, 8(sp)     # Restore return address
+    ld fp, 0(sp)     # Restore frame pointer
+    addi sp, sp, 24  # Deallocate stack space
+    ret              # Return to caller
+

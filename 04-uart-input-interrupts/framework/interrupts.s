@@ -145,25 +145,36 @@ interrupt_handler__not_external_interrupt:
 
 handle_external_interrupt:
     # function prologue
-    addi sp, sp, -16    # allocate space on the stack for the return address and frame pointer
-    sd ra, 8(sp)        # save the return address
+    addi sp, sp, -24 # allocate space on the stack for the return address and frame pointer
+    sd ra, 16(sp)        # save the return address
+    sd s0, 8(sp)
     sd fp, 0(sp)        # save the frame pointer
     addi fp, sp, 16     # set a new fram pointer
 
     # claim
     ld t0, PLIC_M_CLAIM_REG
-    lw t1, 0(t0)        # t1 has the interrupt cause
+    lw s0, 0(t0)        # s0 has the interrupt cause
 
-    // TODO: check if t1 is 10, if so then call uart_interrupt
+    li t1, 10
+    bne s0, t1, handle_external_interrupt__not_uart # if not 7, jump over call to handle_timer_interrupt
+
+    # Call the handler function if mcause is 7
+    call handle_uart_interrupt
+
+handle_external_interrupt__not_uart:
+
+    # TODO: check if t1 is 10, if so then call uart_interrupt
+    call handle_uart_interrupt
 
     # complete
     ld t0, PLIC_M_CLAIM_REG
-    sw t1, 0(t0)
+    sw s0, 0(t0)
 
     # Epilogue
-    ld ra, 8(sp)     # Restore return address
+    ld ra, 16(sp)     # Restore return address
+    ld s0, 8(sp)     # Restore return address
     ld fp, 0(sp)     # Restore frame pointer
-    addi sp, sp, 16  # Deallocate stack space
+    addi sp, sp, 24  # Deallocate stack space
     ret              # Return to caller
 
 
