@@ -15,6 +15,17 @@ RISC-V (commonly pronounced as "risc five") is a type of assembly language for p
 
 QEMU (possibly pronounce "queue emu" or "keh-moo") is a tool that lets us emulate a complete computer system, like a RISC-V board, right on your desktop! This means you can write and test assembly programs in a simulated environment without needing real hardware. It's ideal for exploring and debugging.
 
+## Dependencies
+This project depends on a few executables
+- **A riscv64 qemu build**: A build of the qemu programthat simulates RISC-V boards.
+- **the riscv64 gnu tools**: We rely on a handful of gnu tools (`as` & `ld`) to build our RISC-V programs, we need an install of that software that understands the RISC-V architecture.
+- **A riscv64 compatible gdb**: We will use gdb to debug our programs, and so we will need a build of gdb that can process RISC-V code running in qemu.
+- **socat**: A tool for easily connecting data sources like sockets, files, and pipes. We use it as a way to connect to the qemu monitor.
+
+For instructions on installing the dependencies see the [macOS setup instructions](MAC-OS-SETUP.md) or the [debian/ubuntu setup instructions](DEBIAN-UBUNTU-SETUP.md). 
+
+If you come accross this project and know how to set this up for other platforms, please open a PR! Specifically would love to get instructions for Windows and Arch.
+
 ## Running the programs
 Once you have the dependencies below installed you can `cd` into any of the numbered sub directories in this project and use the makefile to build and run the project. The following make commands will work in each sub directory
 
@@ -46,14 +57,3 @@ make run-debug-monitor    # run this in a terminal and then
 make debugger             # run this in a sperate terminal
 make monitor              # and run this in yet another terminal
 ```
-
-## Dependencies
-This project depends on a few executables
-- **A riscv64 qemu build**: A build of the qemu programthat simulates RISC-V boards.
-- **the riscv64 gnu tools**: We rely on a handful of gnu tools (`as` & `ld`) to build our RISC-V programs, we need an install of that software that understands the RISC-V architecture.
-- **A riscv64 compatible gdb**: We will use gdb to debug our programs, and so we will need a build of gdb that can process RISC-V code running in qemu.
-- **socat**: A tool for easily connecting data sources like sockets, files, and pipes. We use it as a way to connect to the qemu monitor.
-
-For instructions on installing the dependencies see the [macOS setup instructions](MAC-OS-SETUP.md) or the [debian/ubuntu setup instructions](DEBIAN-UBUNTU-SETUP.md). 
-
-If you come accross this project and know how to set this up for other platforms, please open a PR! Specifically would love to get instructions for Windows and Arch.
