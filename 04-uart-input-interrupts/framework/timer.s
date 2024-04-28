@@ -71,9 +71,6 @@ handle_timer_interrupt:
     # reset the interval for timer interrupts
     call reset_mtimecmp
 
-    li a0, 't'
-    jal uart_put_character
-
     # Epilogue
     ld ra, 8(sp)     # Restore return address
     ld fp, 0(sp)     # Restore frame pointer
