@@ -134,7 +134,7 @@ QEMU_MONITOR_FLAGS += -monitor unix:qemu-monitor-socket,server
 
 # This project uses a version of GDB that is compiled to debug riscv64 programs.
 # It is installed with different names on different systems
-DEBUGGER := $(shell which gdb-multiarch || which riscv64-elf-gdb)
+DEBUGGER := $(shell which gdb-multiarch || which riscv64-elf-gdb || which riscv64-unknown-elf-gdb)
 
 ###########################################################################
 # BUILD RULES

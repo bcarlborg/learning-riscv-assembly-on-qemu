@@ -51,7 +51,9 @@ riscv64-unknown-elf-as --version
 riscv64-unknown-elf-ld --version
 
 # ensure that we have the cross platform debugger necessary to debug our programs
+# (depending on your system, one of the two executables below will be there... you only need one! Either will work)
 riscv64-elf-gdb --version
+riscv64-unknown-elf-gdb --version
 
 # ensure that we have the socat command line tool
 # (this command outputs a big wall of text, don't be alarmed, its just a verbose program :shrug:)
