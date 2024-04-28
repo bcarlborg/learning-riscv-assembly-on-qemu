@@ -5,6 +5,7 @@ These notes are really just for me, I make no promises that any of this will be 
 ## General project todos
 - why does gdb sometimes jump to the middle of a function after a breakpoint?
   - is it just ignoring the pre-amble etc?
+- Put a clearer not in the dependencies that explain how to setup .gdbinit
 
 ## Immediate Todos (03-timer-interrupts)
   - [implementation] if we want to do something with the elapsed time we should store an updated time variable in some const in timer.s
