@@ -5,7 +5,7 @@
 .section .data
 
 ticks_interval: 
-    .dword 1000000 # about 1/10th of a second
+    .dword 1000000
 
 .globl ticks_time
 ticks_time:

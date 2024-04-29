@@ -153,18 +153,15 @@ handle_external_interrupt:
 
     # claim
     ld t0, PLIC_M_CLAIM_REG
-    lw s0, 0(t0)        # s0 has the interrupt cause
+    lw s0, 0(t0)        # s0 has the claimed external interrupt source
 
     li t1, 10
-    bne s0, t1, handle_external_interrupt__not_uart # if not 7, jump over call to handle_timer_interrupt
+    bne s0, t1, handle_external_interrupt__not_uart # if not 10, jump over call to handle_uart_interrupt
 
-    # Call the handler function if mcause is 7
+    # Call the uart handler if the plic claim result 10
     call handle_uart_interrupt
 
 handle_external_interrupt__not_uart:
-
-    # TODO: check if t1 is 10, if so then call uart_interrupt
-    call handle_uart_interrupt
 
     # complete
     ld t0, PLIC_M_CLAIM_REG

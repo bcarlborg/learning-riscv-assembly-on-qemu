@@ -6,6 +6,15 @@
 
 .section .data
 
+uart_receive_ring_buffer:
+    .zero 1024
+
+receive_ring_buffer_producer_offset:
+    .dword 0
+
+receive_ring_buffer_consumer_offset:
+    .dword 0
+
 
 #############################################################################
 # SECTION: TEXT
@@ -176,6 +185,124 @@ uart_put_character__test_ready:
     addi sp, sp, 8        # Deallocate space on the stack
     jr ra                 # Return to the caller
 
+.globl read_character
+
+# TODO: probably need to stop interrupts during this block
+# TODO: I think the way I am loading values from 
+read_character:
+
+    # function prologue
+    addi sp, sp, -24 # allocate space on the stack for the return address and frame pointer
+    sd ra, 16(sp)        # save the return address
+    sd s0, 8(sp)
+    sd fp, 0(sp)        # save the frame pointer
+    addi fp, sp, 24 # set a new frame pointer
+
+    jal disable_interrupts
+
+    ld t1, receive_ring_buffer_consumer_offset
+
+    ld t2, receive_ring_buffer_producer_offset
+
+    # If our producer and consumer pointers are at the same offset,
+    # then there are no characters to read
+    beq t1, t2, read_character__no_chars_to_read  
+
+    la t0, uart_receive_ring_buffer
+    ld t1, receive_ring_buffer_consumer_offset
+
+    add t0, t0, t1     # t0 holds ring buffer base + offset (i.e. the address our character is at)
+    ld a0, 0(t0)       # a0 holds the character we are reading
+
+    jal increment_consumer_offset
+
+    j read_character__exit
+
+read_character__no_chars_to_read:
+    li a0, 1
+
+read_character__exit:
+
+    jal enable_interrupts
+
+    # Epilogue
+    ld ra, 16(sp)     # Restore return address
+    ld s0, 8(sp)     # Restore return address
+    ld fp, 0(sp)     # Restore frame pointer
+    addi sp, sp, 24  # Deallocate stack space
+    ret              # Return to caller
+
+#
+# Increment the consumer offset
+#
+.globl increment_consumer_offset
+increment_consumer_offset:
+    # function prologue
+    addi sp, sp, -24 # allocate space on the stack for the return address and frame pointer
+    sd ra, 16(sp)        # save the return address
+    sd s0, 8(sp)
+    sd fp, 0(sp)        # save the frame pointer
+    addi fp, sp, 24 # set a new frame pointer
+
+    ld t1, receive_ring_buffer_consumer_offset # t1 contains the consumer offset
+
+    addi t1, t1, 1          # t1 contains the new consumer offset
+
+    li t0, 1024
+
+    # If our offset is not at the end of the ring buffer, we can just store this new offset
+    blt t1, t0, increment_consumer_offset__store_new_offset  
+
+    # If our offset is at or past the end of the array, we set it back to 0
+    li t1, 0
+    
+increment_consumer_offset__store_new_offset:
+    la t0, receive_ring_buffer_consumer_offset
+    sb t1, 0(t0)
+
+    # Epilogue
+    ld ra, 16(sp)     # Restore return address
+    ld s0, 8(sp)     # Restore return address
+    ld fp, 0(sp)     # Restore frame pointer
+    addi sp, sp, 24  # Deallocate stack space
+    ret              # Return to caller
+
+#
+# Increment the producer offset
+#
+.globl increment_producer_offset
+increment_producer_offset:
+    # function prologue
+    addi sp, sp, -24 # allocate space on the stack for the return address and frame pointer
+    sd ra, 16(sp)        # save the return address
+    sd s0, 8(sp)
+    sd fp, 0(sp)        # save the frame pointer
+    addi fp, sp, 16     # set a new fram pointer
+
+    ld t0, receive_ring_buffer_producer_offset # t1 contains the producer offset
+
+    addi t1, t0, 1          # t1 contains the new producer offset
+
+    li t0, 1024
+
+    # If our offset is not at the end of the ring buffer, we can just store this new offset
+    blt t1, t0, increment_producer_offset__store_new_offset  
+
+    # If our offset is at or past the end of the array, we set it back to 0
+    li t1, 0
+    
+increment_producer_offset__store_new_offset:
+    la t0, receive_ring_buffer_producer_offset
+    sb t1, 0(t0)
+
+    # Epilogue
+    ld ra, 16(sp)     # Restore return address
+    ld s0, 8(sp)     # Restore return address
+    ld fp, 0(sp)     # Restore frame pointer
+    addi sp, sp, 24  # Deallocate stack space
+    ret              # Return to caller
+
+
 #
 # Interrupt handler for external interrupts from the PLIC
 #
@@ -186,7 +313,7 @@ handle_uart_interrupt:
     sd ra, 16(sp)        # save the return address
     sd s0, 8(sp)
     sd fp, 0(sp)        # save the frame pointer
-    addi fp, sp, 16     # set a new fram pointer
+    addi fp, sp, 24 # set a new fram pointer
 
     call read_uart_chars_until_buffer_empty
 
@@ -207,7 +334,7 @@ read_uart_chars_until_buffer_empty:
     sd ra, 16(sp)        # save the return address
     sd s0, 8(sp)
     sd fp, 0(sp)        # save the frame pointer
-    addi fp, sp, 16     # set a new fram pointer
+    addi fp, sp, 24 # set a new fram pointer
 
 
 read_uart_chars_until_buffer_empty__start:
@@ -229,9 +356,20 @@ read_uart_chars_until_buffer_empty__start:
     beq t0, x0, read_uart_chars_until_buffer_empty__end 
 
     ld t0, UART_RBR_REG
-    lb a0, 0(t0)          # a0 holds the byte we read from the receive buffer
+    lb s0, 0(t0)          # s0 holds the byte we read from the receive buffer
 
-    jal uart_put_character
+    la t0, uart_receive_ring_buffer
+
+    ld t1, receive_ring_buffer_producer_offset
+
+    add t0, t0, t1        # t0 contains the address where we should add the next character
+                          # to our ring buffer
+
+    sb s0, 0(t0)          # write the character we read into the received buffer
+
+    jal increment_producer_offset
+
+    # jal uart_put_character
 
     j read_uart_chars_until_buffer_empty__start 
 

@@ -60,7 +60,6 @@ setup:
     li a0, '\n'
     jal uart_put_character
 
-
     # Epilogue
     ld ra, 8(sp)     # Restore return address
     ld fp, 0(sp)     # Restore frame pointer
@@ -79,6 +78,14 @@ loop:
     #
     # YOUR LOOPING CODE HERE
     #
+
+    jal read_character
+
+    beq a0, x0, loop__finish
+
+    jal uart_put_character
+
+loop__finish:
 
     # Epilogue
     ld ra, 8(sp)     # Restore return address
