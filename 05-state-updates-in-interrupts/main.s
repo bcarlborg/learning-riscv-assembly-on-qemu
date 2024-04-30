@@ -13,6 +13,9 @@
 #############################################################################
 .section .data
 
+hello_world_string:
+    .asciz "Hello World!\n"
+
 #############################################################################
 # SECTION: .text
 # The program!
@@ -35,30 +38,8 @@ setup:
     #
 
     # Call the put_uart_function with each character of hello world
-    li a0, 'h'
-    jal uart_put_character
-    li a0, 'e'
-    jal uart_put_character
-    li a0, 'l'
-    jal uart_put_character
-    li a0, 'l'
-    jal uart_put_character
-    li a0, 'o'
-    jal uart_put_character
-    li a0, ' '
-    jal uart_put_character
-    li a0, 'w'
-    jal uart_put_character
-    li a0, 'o'
-    jal uart_put_character
-    li a0, 'r'
-    jal uart_put_character
-    li a0, 'l'
-    jal uart_put_character
-    li a0, 'd'
-    jal uart_put_character
-    li a0, '\n'
-    jal uart_put_character
+    la a0, hello_world_string
+    call print_zero_terminated_string
 
     # Epilogue
     ld ra, 8(sp)     # Restore return address

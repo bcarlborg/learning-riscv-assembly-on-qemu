@@ -15,6 +15,9 @@ receive_ring_buffer_producer_offset:
 receive_ring_buffer_consumer_offset:
     .dword 0
 
+characters_to_print:
+    .zero 1024
+
 
 #############################################################################
 # SECTION: TEXT
@@ -184,6 +187,47 @@ uart_put_character__test_ready:
     ld ra, 0(sp)          # Restore return address
     addi sp, sp, 8        # Deallocate space on the stack
     jr ra                 # Return to the caller
+
+
+.globl print_zero_terminated_string
+# takes a pointer in a0
+print_zero_terminated_string:
+    # function prologue
+    addi sp, sp, -32 # allocate space on the stack for the return address and frame pointer
+    sd ra, 24(sp)       # save the return address
+    sd s1, 16(sp)
+    sd s0, 8(sp)
+    sd fp, 0(sp)        # save the frame pointer
+    addi fp, sp, 32 # set a new frame pointer
+
+    addi s0, a0, 0      # s0 holds the string base address
+    li s1, 0            # s1 holds the index into the string
+
+print_zero_terminated_string__print_at_index__start:
+    add t0, s0, s1      # t0 contains the address of the character to print
+
+    ld t1, 0(t0)        # t1 contains the character to print
+
+    # If t1 is zero, exit the loop
+    beq t1, x0, print_zero_terminated_string__print_at_index__end
+
+    addi a0, t1, 0          # mv t1 into a0
+    call uart_put_character
+
+    # increment our index for the next loop
+    add s1, s1, 1
+
+    j print_zero_terminated_string__print_at_index__start
+
+print_zero_terminated_string__print_at_index__end:
+
+    # Epilogue
+    ld ra, 24 (sp)   # Restore return address
+    ld s1, 16(sp)    # Restore return address
+    ld s0, 8(sp)     # Restore return address
+    ld fp, 0(sp)     # Restore frame pointer
+    addi sp, sp, 32  # Deallocate stack space
+    ret              # Return to caller
 
 .globl read_character
 
