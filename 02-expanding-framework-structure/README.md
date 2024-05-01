@@ -1,4 +1,4 @@
-# 03: Developing a framework for development
+# 02: Developing a framework for development
 As we built up to printing out hello-world in our previous directory, our single file entry.s was getting pretty unwieldy! In this sub-directory, we make some updates to our project's structure to make things easier to follow. The end result of running this program is still the same as it was in the previous sub-directory: we print "hello world".
 
 To go into a tad more detail, in this sub-directory, we make the following changes:

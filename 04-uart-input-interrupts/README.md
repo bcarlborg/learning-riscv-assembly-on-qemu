@@ -1,4 +1,4 @@
-# Setting up a build and run environment
+# 04: Processing UART incoming character interrupts
 In this sub-directory, we add code that processes interrupts from our uart device. Specifically interrupts that tell us a new character is ready to be read on our device.
 
 We intialie the UART device to provide us with these interrupts and we also configure the PLIC to provide these interrupts to the hart running our code.
