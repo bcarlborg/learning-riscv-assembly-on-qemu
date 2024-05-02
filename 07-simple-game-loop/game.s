@@ -40,6 +40,9 @@ game_background:
     .ascii "|                                                                     |\n"
     .asciz "-----------------------------------------------------------------------"
 
+food_position:
+    .zero 2
+
 #
 # Indicates the direction that the snake is moving
 #
@@ -742,6 +745,131 @@ game_game_over:
     addi sp, sp, 16       # Deallocate space on the stack
     jr ra                 # Return to the caller
 
+#
+# Function to print food
+#
+set_food_pos_then_print:
+
+    # Function prologue
+    addi sp, sp, -32      # Allocate space on the stack
+    sd s2, 24(sp)
+    sd s1, 16(sp)
+    sd s0, 8(sp)
+    sd ra, 0(sp)           # Save return address
+
+    la t1, food_position
+    lb t0, 0(t1)           # food pos column
+
+    # If the food position is not zero, then there isn't anything for us to do!
+    bne t0, x0, set_food_pos_then_print__exit             
+
+set_food_pos_then_print__try_random_pos:
+    # get a random column value in a0
+    li a0, 2
+    li a1, 70
+    call random
+    mv s1, a0       # s1 has potential new column
+
+    li a0, 2
+    li a1, 25
+    call random
+    mv s2, a0       # s2 has potential new column
+
+    lh t0, snake_tail_offset
+    addi s0, t0, 0             # s0 holds the offset we are currently processing
+
+set_food_pos_then_print__check_start:
+    lh t1, snake_head_offset
+    beq s0, t1, set_food_pos_then_print__check_end
+
+    la t2, snake
+    add t2, t2, s0       # t2 contains the address of the current snake segment to print
+
+    lb t1, 0(t2)         # t1 contains the current snake segment column
+    addi t2, t2, 1
+    lb t2, 0(t2)         # t2 contains the current snake segment line
+
+    bne s1, t1, set_food_pos_then_print__increment_and_loop  # check our potential random column
+    bne s1, t2, set_food_pos_then_print__increment_and_loop  # check our potential random line
+
+    # only get here if the potential food position matches the snake part we are currently considering
+    j set_food_pos_then_print__try_random_pos 
+
+set_food_pos_then_print__increment_and_loop:
+    addi s0, s0, 2
+    j set_food_pos_then_print__check_start
+
+set_food_pos_then_print__check_end:
+
+    # store the new food position
+    la t0, food_position
+    sb s1, 0(t0)
+    sb s2, 1(t0)
+
+    mv a0, s2  # food line in a0
+    mv a1, s1  # food column in a1
+    li a2, 'O'
+    call terminal_write_character_at_position
+
+set_food_pos_then_print__exit:
+    # Function epilogue
+    ld s2, 24(sp)
+    ld s1, 16(sp)
+    ld s0, 8(sp)
+    ld ra, 0(sp)          # Restore return address
+    addi sp, sp, 32       # Deallocate space on the stack
+    jr ra                 # Return to the caller
+
+#
+# maybe eat food!
+# a0 = 1 if food was eaten
+#
+game_maybe_eat_food:
+    # Function prologue
+    addi sp, sp, -32      # Allocate space on the stack
+    sd s2, 24(sp)
+    sd s1, 16(sp)
+    sd s0, 8(sp)
+    sd ra, 0(sp)           # Save return address
+
+    call game_get_snake_head_pos
+
+    la s0, food_position   # s0 = food pos address
+    lb t0, 0(s0)           # t0 = food pos column
+    lb t1, 1(s0)           # t1 = food pos line
+
+    # If snake head column doesn't match food column, they aren't
+    # in the same spot
+    bne a0, t0, game_maybe_eat_food__not_eating
+    # If snake head line doesn't match food line, they aren't
+    # in the same spot
+    bne a1, t1, game_maybe_eat_food__not_eating
+
+    # If we are here, the food is in the same position as the snake head
+    # fall through to the "eating" case
+game_maybe_eat_food__eating:
+    # zero out food position
+    sb x0, 0(s0)
+    sb x0, 1(s0)
+
+    # return 1
+    li a0, 1
+    j game_maybe_eat_food__exit
+
+game_maybe_eat_food__not_eating:
+    li a0, 0
+    j game_maybe_eat_food__exit
+
+game_maybe_eat_food__exit:
+    # Function epilogue
+    ld s2, 24(sp)
+    ld s1, 16(sp)
+    ld s0, 8(sp)
+    ld ra, 0(sp)          # Restore return address
+    addi sp, sp, 32       # Deallocate space on the stack
+    jr ra                 # Return to the caller
+
+
 
 #
 # Function that processes the read characters and prints the new game state
@@ -757,15 +885,24 @@ update_game_state_and_refresh_view:
     # If game over is not equal to zero, exit
     bne t0, x0, update_game_state_and_refresh_view__exit
 
+    call set_food_pos_then_print
+
     call game_read_chars_and_update_snake_direction
 
     call move_snake_head_forward 
 
     call game_print_snake_head
 
-    call game_erase_snake_tail
+    call game_maybe_eat_food
 
+    # If a0 is not 0, then we ate food, and we can grow the tail
+    bne a0, x0, update_game_state_and_refresh_view__grow_tail
+
+update_game_state_and_refresh_view__do_not_grow_tail:
+    call game_erase_snake_tail
     call game_increment_snake_tail_offset
+
+update_game_state_and_refresh_view__grow_tail:
 
     li a0, 1
     li a1, 1
