@@ -4,6 +4,11 @@
 #############################################################################
 .section .data
 
+game_over:
+    .byte 0
+
+game_over_string:
+    .asciz "G A M E    O V E R"
 #
 # Game grid, open characters are from line: 2 - 25 || col 2 - 70
 #
@@ -50,7 +55,7 @@ snake_direction:
 
 # snake head offset is 2 byte integer indicating how far into snake the head is
 snake_head_offset:
-    .word 14
+    .word 24
 
 # snake tail offset is 2 byte integer indicating how far into snake the tail is
 snake_tail_offset:
@@ -75,7 +80,17 @@ snake:
     .byte 10         # line
     .byte 12         # column offset 14 (snake part 8)
     .byte 10         # line
-    .zero 2032       # = 2048 - 2 * (number of snake parts = 8)
+    .byte 13         # column offset 16 (snake part 8)
+    .byte 10         # line
+    .byte 14         # column offset 18 (snake part 9)
+    .byte 10         # line
+    .byte 15         # column offset 20 (snake part 10)
+    .byte 10         # line
+    .byte 16         # column offset 22 (snake part 11)
+    .byte 10         # line
+    .byte 17         # column offset 24 (snake part 12)
+    .byte 10         # line
+    .zero 2024       # = 2048 - 2 * (number of snake parts = 8)
 
 #############################################################################
 # SECTION: .text
@@ -548,7 +563,6 @@ game_print_initial_snake__print_start:
 
     call terminal_write_character_at_position
 
-
     addi s0, s0, 2
 
     j game_print_initial_snake__print_start
@@ -567,14 +581,181 @@ game_print_initial_snake__print_end:
 
 
 #
+# checks if the snake is colliding with the wall
+#
+game_is_snake_hit_wall:
+    # Function prologue
+    addi sp, sp, -16       # Allocate space on the stack
+    sd s0, 8(sp)
+    sd ra, 0(sp)          # Save return address
+
+    # a0 = snake head column
+    # a1 = snake head row
+    call game_get_snake_head_pos
+
+    # snake hit left edge
+    li t0, 1
+    beq a0, t0, game_is_snake_hit_wall__death
+
+    # snake hit top edge
+    li t0, 1
+    beq a1, t0, game_is_snake_hit_wall__death
+
+    # snake hit right edge
+    li t0, 71
+    beq a0, t0, game_is_snake_hit_wall__death
+
+    # snake hit bottom edge
+    li t0, 26
+    beq a1, t0, game_is_snake_hit_wall__death
+
+game_is_snake_hit_wall__lives:
+    li a0, 0
+    j game_is_snake_hit_wall__exit
+
+game_is_snake_hit_wall__death:
+    li a0, 1
+    j game_is_snake_hit_wall__exit
+
+game_is_snake_hit_wall__exit:
+
+    # Function epilogue
+    ld s0, 8(sp)
+    ld ra, 0(sp)          # Restore return address
+    addi sp, sp, 16       # Deallocate space on the stack
+    jr ra                 # Return to the caller
+
+#
+# checks if the snake is colliding with itself
+#
+game_is_snake_hit_self:
+    # Function prologue
+    addi sp, sp, -24      # Allocate space on the stack
+    sd s1, 16(sp)
+    sd s0, 8(sp)
+    sd ra, 0(sp)          # Save return address
+
+    # a0 has snake head pos column
+    # a1 has snake head pos line
+    call game_get_snake_head_pos
+
+    lh t0, snake_tail_offset
+    addi s0, t0, 0             # s0 holds the offset we are currently processing
+
+game_is_snake_hit_self__check_start:
+    lh t1, snake_head_offset
+    beq s0, t1, game_is_snake_hit_self__check_end
+
+    la t2, snake
+    add t2, t2, s0       # t2 contains the address of the current snake segment to print
+
+    lb t1, 0(t2)         # t1 contains the current snake segment column
+    addi t2, t2, 1
+    lb t2, 0(t2)         # t2 contains the current snake segment line
+
+    bne a0, t1, game_is_snake_hit_self__increment_and_loop
+    bne a1, t2, game_is_snake_hit_self__increment_and_loop
+
+    # only get here if the current position is equal to the head position
+    j game_is_snake_hit_self__dies 
+
+game_is_snake_hit_self__increment_and_loop:
+    addi s0, s0, 2
+    j game_is_snake_hit_self__check_start
+
+game_is_snake_hit_self__check_end:
+game_is_snake_hit_self__lives:
+    li a0, 0
+    j game_is_snake_hit_self__exit
+
+game_is_snake_hit_self__dies:
+    li a0, 1
+    j game_is_snake_hit_self__exit
+
+game_is_snake_hit_self__exit:
+    # Function epilogue
+    ld s0, 16(sp)
+    ld s0, 8(sp)
+    ld ra, 0(sp)          # Restore return address
+    addi sp, sp, 24       # Deallocate space on the stack
+    jr ra                 # Return to the caller
+
+#
+# checks if the snake is colliding with something it shouldn't be
+#
+game_is_snake_death_colliding:
+    # Function prologue
+    addi sp, sp, -16       # Allocate space on the stack
+    sd s0, 8(sp)
+    sd ra, 0(sp)          # Save return address
+
+    call game_is_snake_hit_wall
+    li t0, 1
+    beq a0, t0, game_is_snake_death_colliding__death
+
+    call game_is_snake_hit_self
+    li t0, 1
+    beq a0, t0, game_is_snake_death_colliding__death
+
+game_is_snake_death_colliding__lives:
+    li a0, 0
+    j game_is_snake_death_colliding__exit
+
+game_is_snake_death_colliding__death:
+    li a0, 1
+    j game_is_snake_death_colliding__exit
+
+game_is_snake_death_colliding__exit:
+
+    # Function epilogue
+    ld s0, 8(sp)
+    ld ra, 0(sp)          # Restore return address
+    addi sp, sp, 16       # Deallocate space on the stack
+    jr ra                 # Return to the caller
+
+
+#
+# Print game over
+#
+game_game_over:
+    # Function prologue
+    addi sp, sp, -16       # Allocate space on the stack
+    sd s0, 8(sp)
+    sd ra, 0(sp)           # Save return address
+
+    # set the game over state
+    li t0, 1
+    la t1, game_over
+    sb t0, 0(t1)
+
+    li a0, 10   # line
+    li a1, 25   # column
+
+    call terminal_move_cursor_to_position
+
+    la a0, game_over_string
+    call print_zero_terminated_string
+
+    # Function epilogue
+    ld s0, 8(sp)
+    ld ra, 0(sp)          # Restore return address
+    addi sp, sp, 16       # Deallocate space on the stack
+    jr ra                 # Return to the caller
+
+
+#
 # Function that processes the read characters and prints the new game state
 #
-
 .globl update_game_state_and_refresh_view
 update_game_state_and_refresh_view:
     # Function prologue
     addi sp, sp, -8       # Allocate space on the stack
     sd ra, 0(sp)          # Save return address
+
+    # If game over just exit
+    lb t0, game_over
+    # If game over is not equal to zero, exit
+    bne t0, x0, update_game_state_and_refresh_view__exit
 
     call game_read_chars_and_update_snake_direction
 
@@ -589,6 +770,18 @@ update_game_state_and_refresh_view:
     li a0, 1
     li a1, 1
     call terminal_move_cursor_to_position
+
+    # If there is a death collision, call game over
+    call game_is_snake_death_colliding
+    li t0, 1
+    beq a0, t0, update_game_state_and_refresh_view__game_over
+
+    j update_game_state_and_refresh_view__exit
+
+update_game_state_and_refresh_view__game_over:
+    call game_game_over
+
+update_game_state_and_refresh_view__exit:
 
     # Function epilogue
     ld ra, 0(sp)          # Restore return address

@@ -44,5 +44,6 @@ _start__pre_loop:
 # Jump here to spin after you finish your work
 #############################################################################
 
+.globl spin
 spin:
     j spin
