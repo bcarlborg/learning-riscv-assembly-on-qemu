@@ -139,8 +139,11 @@ game_print_background_and_home_cursor:
 
 game_read_chars_and_update_snake_direction:
     # Function prologue
-    addi sp, sp, -8       # Allocate space on the stack
+    addi sp, sp, -16       # Allocate space on the stack
+    sd s0, 8(sp)
     sd ra, 0(sp)          # Save return address
+
+    lb s0, snake_direction
 
 game_read_chars_and_update_snake_direction__read_char:
     call read_character
@@ -170,10 +173,8 @@ game_read_chars_and_update_snake_direction__direction_up:
     lb t1, snake_direction
     beq t0, t1, game_read_chars_and_update_snake_direction__read_char
 
-    li t0, 0
-    la t1, snake_direction 
-    sb t0, 0(t1)
-    j game_read_chars_and_update_snake_direction__read_char
+    li s0, 0
+    j game_read_chars_and_update_snake_direction__exit
 
 game_read_chars_and_update_snake_direction__direction_right:
     # If the snake's direction is left, we don't want to
@@ -182,10 +183,8 @@ game_read_chars_and_update_snake_direction__direction_right:
     lb t1, snake_direction
     beq t0, t1, game_read_chars_and_update_snake_direction__read_char
 
-    li t0, 1
-    la t1, snake_direction 
-    sb t0, 0(t1)
-    j game_read_chars_and_update_snake_direction__read_char
+    li s0, 1
+    j game_read_chars_and_update_snake_direction__exit
 
 game_read_chars_and_update_snake_direction__direction_down:
     # If the snake's direction is up, we don't want to
@@ -194,10 +193,8 @@ game_read_chars_and_update_snake_direction__direction_down:
     lb t1, snake_direction
     beq t0, t1, game_read_chars_and_update_snake_direction__read_char
 
-    li t0, 2
-    la t1, snake_direction 
-    sb t0, 0(t1)
-    j game_read_chars_and_update_snake_direction__read_char
+    li s0, 2
+    j game_read_chars_and_update_snake_direction__exit
 
 game_read_chars_and_update_snake_direction__direction_left:
     # If the snake's direction is right, we don't want to
@@ -206,16 +203,20 @@ game_read_chars_and_update_snake_direction__direction_left:
     lb t1, snake_direction
     beq t0, t1, game_read_chars_and_update_snake_direction__read_char
 
-    li t0, 3
-    la t1, snake_direction 
-    sb t0, 0(t1)
-    j game_read_chars_and_update_snake_direction__read_char
+    li s0, 3
+    j game_read_chars_and_update_snake_direction__exit
     
 
 game_read_chars_and_update_snake_direction__exit:
+
+    # store the  new direction
+    la t1, snake_direction 
+    sb s0, 0(t1)
+
     # Function epilogue
+    ld s0, 8(sp)
     ld ra, 0(sp)          # Restore return address
-    addi sp, sp, 8        # Deallocate space on the stack
+    addi sp, sp, 16       # Deallocate space on the stack
     jr ra                 # Return to the caller
 
 
@@ -919,6 +920,11 @@ update_game_state_and_refresh_view__game_over:
     call game_game_over
 
 update_game_state_and_refresh_view__exit:
+
+    # call random just to update the seed we aren't using the result,
+    # but by calling the function on every render, we make it so that
+    # the food doesn't appear in the same spot on every render as you play the game
+    call random
 
     # Function epilogue
     ld ra, 0(sp)          # Restore return address
