@@ -4,6 +4,15 @@
 #############################################################################
 .section .data
 
+score_number_string:
+    .zero 16
+
+score_text:
+    .asciz "score: "
+
+score_value:
+    .word 0
+
 game_over:
     .byte 0
 
@@ -849,7 +858,14 @@ game_maybe_eat_food:
     # If we are here, the food is in the same position as the snake head
     # fall through to the "eating" case
 game_maybe_eat_food__eating:
-    # zero out food position
+    # EAT THE FOOD - YOU GET A POINT
+    la t0, score_value
+    lw t1, 0(t0)
+    addi t1, t1, 1
+    sw t1, 0(t0)
+
+    # zero out food position so that we find a new food position on the next
+    # game loop
     sb x0, 0(s0)
     sb x0, 1(s0)
 
@@ -871,6 +887,39 @@ game_maybe_eat_food__exit:
     jr ra                 # Return to the caller
 
 
+#
+# Print score
+#
+game_print_score:
+    # Function prologue
+    addi sp, sp, -32      # Allocate space on the stack
+    sd s2, 24(sp)
+    sd s1, 16(sp)
+    sd s0, 8(sp)
+    sd ra, 0(sp)           # Save return address
+
+    li a0, 27   # line to print score
+    li a1, 2    # column to print score
+
+    call terminal_move_cursor_to_position
+
+    la a0, score_text
+    call print_zero_terminated_string
+
+    lw a0, score_value
+    la a2, score_number_string
+    call num_to_ascii
+
+    la a0, score_number_string
+    call print_zero_terminated_string
+
+    # function epilogue
+    ld s2, 24(sp)
+    ld s1, 16(sp)
+    ld s0, 8(sp)
+    ld ra, 0(sp)          # Restore return address
+    addi sp, sp, 32       # Deallocate space on the stack
+    jr ra                 # Return to the caller
 
 #
 # Function that processes the read characters and prints the new game state
@@ -885,6 +934,8 @@ update_game_state_and_refresh_view:
     lb t0, game_over
     # If game over is not equal to zero, exit
     bne t0, x0, update_game_state_and_refresh_view__exit
+
+    call game_print_score
 
     call set_food_pos_then_print
 

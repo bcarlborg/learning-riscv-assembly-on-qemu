@@ -61,7 +61,7 @@ loop:
     # If we are here it means ticks_time has passed the next render threshold
 
 loop__render:
-    li t0, 1300000
+    li t0, 1100000
     add t0, t0, t1     # t0 = 10000000 + ticks_time
 
     la t2, next_render
