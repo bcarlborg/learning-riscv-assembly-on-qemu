@@ -1,59 +1,53 @@
-# Learning RISC-V Assembly on Qemu
-Welcome to my repository of assembly programs designed for an emulated RISC-V computer!
+# Learning RISC-V Assembly on Qemu By Building Snake
 
-This project is organized into sub-directories, each representing a different stage of my journey learning assembly programming for a virtual RISC-V system. Every folder is a complete project in itself, building upon the last by introducing new features or enhancing the structure and efficiency of the code. Dive into each one to see the progression of functionality and improvements!
+I created this project to learn how to setup a simulated embedded program in riscv running on qemu. I wanted to write assembly code at a "bare metal" level to learn a little bit about how code runs directly on a computer system.
 
-Feel free to explore and get inspired as you see assembly programming in action!
+This project is simply for learning, and so I chose to implement a clone of the classic snake game.
+
+## Repository Organization
+This project is organized into sub-directories that show each stage of my development of the snake game. Every folder is created as a copy of the one preceding it, and then added to until I was able to introduce a new feature. I chose to structure the repository this way because I wanted the repository to show how I incrementally built the game up one bit of functionality at a time.
+
 See the README.md in each of the sub-directories for information about what the software in that directory does.
 
 ## What is a virtual RISC-V Qemu board? 
 **To start: what is RISC-V?**
 
-RISC-V (commonly pronounced as "risc five") is a type of assembly language for processors that follow the open RISC-V instruction set architecture. It's designed to be simple and modular, perfect for learning how CPUs interpret commands.
+RISC-V (commonly pronounced as "risc five") is an open source instruction set architecture for CPUs. This means that processors which implement the RISC-V ISA can all run the same binary programs. The ISA is designed to be simple and modular, itss specification is all open source, and it is very well supported in Qemu. All of these qualities make which makes it the perfect architecture to target for when learning assembly programming.
 
 **Ok... and what is a virtual Qemu board?**
 
-QEMU (possibly pronounce "queue emu" or "keh-moo") is a tool that lets us emulate a complete computer system, like a RISC-V board, right on your desktop! This means you can write and test assembly programs in a simulated environment without needing real hardware. It's ideal for exploring and debugging.
+QEMU (possibly pronounce "queue-emu" or "keh-moo") is a tool that lets us emulate a complete computer system, like a RISC-V board, right on your desktop! This means you can write and test assembly programs in a simulated environment without needing real hardware. It's ideal for exploring and debugging.
 
-## Dependencies
-This project depends on a few executables
-- **A riscv64 qemu build**: A build of the qemu programthat simulates RISC-V boards.
-- **the riscv64 gnu tools**: We rely on a handful of gnu tools (`as` & `ld`) to build our RISC-V programs, we need an install of that software that understands the RISC-V architecture.
-- **A riscv64 compatible gdb**: We will use gdb to debug our programs, and so we will need a build of gdb that can process RISC-V code running in qemu.
-- **socat**: A tool for easily connecting data sources like sockets, files, and pipes. We use it as a way to connect to the qemu monitor.
-
+## FAQS
+<details>
+<summary>What are the dependencies for running the project and how do I install them?</summary>
 For instructions on installing the dependencies see the [macOS setup instructions](MAC-OS-SETUP.md) or the [debian/ubuntu setup instructions](DEBIAN-UBUNTU-SETUP.md). 
 
-If you come accross this project and know how to set this up for other platforms, please open a PR! Specifically would love to get instructions for Windows and Arch.
+If you come accross this project and know how to set this up for other platforms, please open a PR! I specifically would love to add instructions for Windows and Arch Linux.
+</details>
 
-## Running the programs
+<details>
+<summary>How do I run the assembly programs in this project?</summary>
 Once you have the dependencies below installed you can `cd` into any of the numbered sub directories in this project and use the makefile to build and run the project. The following make commands will work in each sub directory
 
 ```bash
-# Simply running the program:
-# to build the program and run it with qemu use the following make invocation
+# begin by changing directory into any of this projects numbered sub directories.
 
+# To build and run the program:
 make run
 
 # Running the program with a debugger:
-# Use these commands to build the program and run it in a mode such that a debugger
-# running in another terminal can be attatched.
-
-make run-debug     # run this in a terminal and then
-make debugger      # run this in a sperate terminal
+make run-debug     # run this in a terminal to start up qemu then
+make debugger      # run this in a sperate terminal to start the debugger
 
 # Running the program with the qemu monitor:
-# Use these commands to build the program and run it in a mode such that another
-# terminal can attach to qemu's system monitor.
+make run-monitor   # run this in a terminal to start up qemu then
+make monitor       # run this in a sperate terminal to start the qemu monitor
 
-make run-monitor   # run this in a terminal and then
-make monito        # run this in a sperate terminal
 
-# And finally, to run the program in such a way that allows BOTH the monitor
-# AND the debugger to be attached at the same time, run the following three
-# commands in three seperate terminals.
-
+# Running the program with both the qemu monitor and the debugger:
 make run-debug-monitor    # run this in a terminal and then
 make debugger             # run this in a sperate terminal
 make monitor              # and run this in yet another terminal
 ```
+</details>

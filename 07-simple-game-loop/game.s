@@ -106,9 +106,6 @@ snake:
 
 #############################################################################
 # SECTION: .text
-# The program!
-# The framework will call setup() once
-# then will call loop() in a continuous while loop
 #############################################################################
 
 .section .text
@@ -748,6 +745,11 @@ game_game_over:
 
     la a0, game_over_string
     call print_zero_terminated_string
+
+    li a0, 27 # line
+    li a1, 1 # column
+
+    call terminal_move_cursor_to_position
 
     # Function epilogue
     ld s0, 8(sp)
