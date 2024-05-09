@@ -1,16 +1,16 @@
-# 🎮 Learning "Bare-Metal" RISC-V Assembly By Building Snake
+# 🎮 Learning RISC-V Assembly By Building Snake
 I created this project to learn how to write and configure an embedded RISC-V program running in Qemu. I wanted to write assembly code at a "bare metal" level to learn a little bit about how code runs directly on a computer system and learn about interfacing with hardware devices, handling interrupts, and building executables for an embedded environment.
 
 For this project, I wanted to implement a program that was substantial enough to be exciting, but not so complex that I would be mired in application logic. Ultimately, I chose to implement a clone of the classic snake game (gif below shows a demo of my clone). The game has simple mechanics that are easy to understand, but is complex enough to be interesting to play and watch.
 
-![snake_demo](./snake.gif)
+![snake_demo](./snake-final-demo.gif)
 
 ## What is RISC-V? What is Qemu? And what does Embedded mean?
 All great questions!
 
 **To start: What is RISC-V?**
 
-RISC-V (commonly pronounced as "risc five") is an open source instruction set architecture for CPUs. This means that processors which implement the RISC-V ISA can all run the same binary programs. The ISA is designed to be simple and modular, its specification is all open source, and it is very well supported in Qemu. All of these qualities make which makes it the perfect architecture to target for when learning assembly programming.
+RISC-V (commonly pronounced as "risk five") is an open source instruction set architecture for CPUs. This means that processors which implement the RISC-V ISA can all run the same binary programs. The ISA is designed to be simple and modular, its specification is all open source, and it is very well supported in Qemu. All of these qualities make which makes it the perfect architecture to target for when learning assembly programming.
 
 It is worth stating that even though RISC-V is great for learning, it is far from a toy or teaching prop! RISC-V is early in it's adoption, but there are more and more vendors building RISC-V chips every year.
 
