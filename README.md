@@ -1,22 +1,39 @@
-# Learning RISC-V Assembly on Qemu By Building Snake
+# 🎮 Learning "Bare-Metal" RISC-V Assembly By Building Snake
+I created this project to learn how to write and configure an embedded RISC-V program running in Qemu. I wanted to write assembly code at a "bare metal" level to learn a little bit about how code runs directly on a computer system and learn about interfacing with hardware devices, handling interrupts, and building executables for an embedded environment.
 
-I created this project to learn how to setup a simulated embedded program in riscv running on qemu. I wanted to write assembly code at a "bare metal" level to learn a little bit about how code runs directly on a computer system.
+For this project, I wanted to implement a program that was substantial enough to be exciting, but not so complex that I would be mired in application logic. Ultimately, I chose to implement a clone of the classic snake game (gif below shows a demo of my clone). The game has simple mechanics that are easy to understand, but is complex enough to be interesting to play and watch.
 
-This project is simply for learning, and so I chose to implement a clone of the classic snake game.
+![snake_demo](./snake.gif)
 
-## Repository Organization
+## What is RISC-V? What is Qemu? And what does Embedded mean?
+All great questions!
+
+**To start: What is RISC-V?**
+
+RISC-V (commonly pronounced as "risc five") is an open source instruction set architecture for CPUs. This means that processors which implement the RISC-V ISA can all run the same binary programs. The ISA is designed to be simple and modular, its specification is all open source, and it is very well supported in Qemu. All of these qualities make which makes it the perfect architecture to target for when learning assembly programming.
+
+It is worth stating that even though RISC-V is great for learning, it is far from a toy or teaching prop! RISC-V is early in it's adoption, but there are more and more vendors building RISC-V chips every year.
+
+**Ok, and what is Qemu?**
+
+QEMU (possibly pronounce "queue-emu" or "keh-moo") is a tool that lets us emulate a complete computer system, like a RISC-V board. This means you can write and test assembly programs in a simulated environment without needing the real hardware. Even though the computers I use for development have Arm or Intel chips, I can still run RISC-V programs using qemu.
+
+**Great, and what does embedded or "bare-metal" mean?**
+While these terms don't have precise definitions, I can share my understanding of these words. Embedded software is code that's built to run specifically on certain hardware, often times without a traditional operating system. Embedded software is often responsible for interfacing directly with the hardware it is running on and must work without using the primitives that an operating system typically provides.
+
+## Project Organization
 This project is organized into sub-directories that show each stage of my development of the snake game. Every folder is created as a copy of the one preceding it, and then added to until I was able to introduce a new feature. I chose to structure the repository this way because I wanted the repository to show how I incrementally built the game up one bit of functionality at a time.
 
 See the README.md in each of the sub-directories for information about what the software in that directory does.
 
-## What is a virtual RISC-V Qemu board? 
-**To start: what is RISC-V?**
+TODO: update README's in the directories and then list and link those readme files here
 
-RISC-V (commonly pronounced as "risc five") is an open source instruction set architecture for CPUs. This means that processors which implement the RISC-V ISA can all run the same binary programs. The ISA is designed to be simple and modular, itss specification is all open source, and it is very well supported in Qemu. All of these qualities make which makes it the perfect architecture to target for when learning assembly programming.
+## How is the game implemented?
+The assembly program I wrote is loaded directly into memory when qemu is invoked, and begins executing immediately. This very stripped down environment has a few implications for how our software is built. Because our program is running without the utilities an operating system provides, we are on the line for writing code that serves the same purposes as an operating systems device drivers, or a distributions standard library. Our project also needs a build system that can assemble and link our files to create a binary that is appropriately formatted to run on a "bare metal" system.
 
-**Ok... and what is a virtual Qemu board?**
+This program only uses a single device to read and print characters to the terminal -- the UART device. UART stands for universal asynchronous receiver-transmitter. Computers can use a uart to communicate with other devices using a serial connection. We invoke qemu in such a way that the host terminal is "hooked up" to the uart such that any characters typed in the terminal are sent to the guest, and any characters written by the guest are printed on the terminal.
 
-QEMU (possibly pronounce "queue-emu" or "keh-moo") is a tool that lets us emulate a complete computer system, like a RISC-V board, right on your desktop! This means you can write and test assembly programs in a simulated environment without needing real hardware. It's ideal for exploring and debugging.
+The "graphics" for the program are implemented by printing terminal control characters to move the cursor, erase characters and write characters on every frame. The "interactions" for the game are implemented by handling all key presses in a system wide interrupt handler which stores those key presses in a buffer that the main game loop can consume.
 
 ## FAQS
 <details>
@@ -50,4 +67,9 @@ make run-debug-monitor    # run this in a terminal and then
 make debugger             # run this in a sperate terminal
 make monitor              # and run this in yet another terminal
 ```
+</details>
+
+<details>
+<summary>I started running the game... but can't make it stop, help!</summary>
+When qemu is running in it's terminal mode, you need to press `ctrl-a x` to exit.
 </details>
