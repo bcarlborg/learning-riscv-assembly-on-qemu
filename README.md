@@ -26,7 +26,7 @@ This project is organized into sub-directories that show each stage of my develo
 
 See the README.md in each of the sub-directories for information about what the software in that directory does.
 
-TODO: update README's in the directories and then list and link those readme files here
+TODO: update README's in the directories and then list and link those readme files here.
 
 ## How is the game implemented?
 The assembly program I wrote is loaded directly into memory when qemu is invoked, and begins executing immediately. This very stripped down environment has a few implications for how our software is built. Because our program is running without the utilities an operating system provides, we are on the line for writing code that serves the same purposes as an operating systems device drivers, or a distributions standard library. Our project also needs a build system that can assemble and link our files to create a binary that is appropriately formatted to run on a "bare metal" system.
